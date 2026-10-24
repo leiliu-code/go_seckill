@@ -1,37 +1,53 @@
 # ============================================================
 # .gitignore —— 告诉 git 哪些文件不要纳入版本控制
-# 作用范围：只对当前仓库（go-seckill）生效
+# 作用范围：只对当前仓库（go_seckill）生效
 # 怎么看效果：改完执行 git status，被忽略的文件不会出现在列表里
 # 回滚：删掉本文件即可（已提交的历史不受影响）
+# 关键注意事项：git 不支持"行尾注释"。模式后面跟 `# 说明` 时，整行会被当成
+#   一个"文件名里含井号"的模式，这条规则直接失效（2026-10-24 踩过：*.exe 因此没生效）。
+#   所以本文件所有说明都独占一行，写在被说明模式的正上方。
 # ============================================================
 
 # ---- 编译产物：二进制体积大、每次编译都变，进仓库毫无意义 ----
-*.exe          # Windows 可执行文件，go build 的产物
+# Windows 可执行文件，go build 的产物
+*.exe
 *.exe~
 *.dll
 *.so
 *.dylib
-bin/           # 如果你习惯把产物输出到 bin/ 目录
+# 如果你习惯把产物输出到 bin/ 目录
+bin/
 
 # ---- 测试与覆盖率产物：每次 go test 都重新生成 ----
-*.test         # go test -c 生成的测试二进制
-*.out          # 性能分析 pprof / 基准测试输出
-coverage.html  # go test -coverprofile 生成的覆盖率报告
+# go test -c 生成的测试二进制
+*.test
+# 性能分析 pprof / 基准测试输出
+*.out
+# go test -coverprofile 生成的覆盖率报告
+coverage.html
 
 # ---- 依赖目录：现代 Go 用 module cache（在 GOPATH），仓库里不会有 vendor ----
 /vendor/
 
 # ---- 编辑器 / 操作系统垃圾文件：每个人环境不同，别强加给队友 ----
-.idea/         # GoLand
-.vscode/       # VS Code
-*.swp          # vim 临时文件
-.DS_Store      # macOS
-Thumbs.db      # Windows 缩略图缓存
+# GoLand
+.idea/
+# VS Code
+.vscode/
+# vim 临时文件
+*.swp
+# macOS
+.DS_Store
+# Windows 缩略图缓存
+Thumbs.db
 
 # ---- 本地配置与密钥：里面有数据库密码，推到 GitHub 等于公开泄露 ----
-config.local.yaml   # 本地覆盖配置（放 dsn、redis 密码）
-.env                # 环境变量文件
-*.local             # 一切 *.local 后缀的本地文件
+# 本地覆盖配置（放 dsn、redis 密码）
+config.local.yaml
+# 环境变量文件
+.env
+# 一切 *.local 后缀的本地文件
+*.local
 
 # ---- 日志与临时文件 ----
 *.log
@@ -40,4 +56,4 @@ tmp/
 # ---- 注意：不要忽略下面这些，它们是项目的一部分 ----
 # go.mod  / go.sum   -> 依赖清单，必须提交，否则别人拉不下来
 # migrations/        -> 建表 SQL，必须提交
-# README.md          -> 面试官第一眼看的文件，必须提交
+# README.md          -> 面试官第一眼看到的文件，必须提交
