@@ -12,7 +12,7 @@ const (
 	OrderStatusCanceled
 )
 
-//  Product 商品表模型，一行是一个可售商品
+// Product 商品表模型，一行是一个可售商品
 type Product struct {
 	ID        uint64    `gorm:"column:id;primaryKey;autoIncrement"` // 主键，自增
 	Name      string    `gorm:"column:name"`                        // 商品名称
