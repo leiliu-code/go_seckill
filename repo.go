@@ -19,7 +19,7 @@ func (r *ProductRepo) ListProducts(ctx context.Context) ([]Product, error) {
 	var products []Product
 	err := r.db.WithContext(ctx).Find(&products).Error
 	if err != nil {
-		panic(fmt.Errorf("func ListProducts,table products, err: %w", err))
+		return nil, fmt.Errorf("seckill databases,products table: %w", err) // 错误路径：nil + 包装后的错误
 	}
-	return products, err
+	return products, nil
 } //先定义了一个空商品切片，WithContext对句柄进行包装，Find函数查询数据库里面的products表，把结果放到products切片里面，最后返回这个切片和错误信息

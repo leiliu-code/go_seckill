@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -10,15 +12,15 @@ type ProductHandler struct {
 
 func NewProductHandler(repo *ProductRepo) *ProductHandler {
 	return &ProductHandler{repo: repo}
-} //返回新指针，在不同部分新定义商品，知道对商品做了什么
+} //返回新指针，依赖repo层
 
 func (h *ProductHandler) List(c *gin.Context) {
 	list, err := h.repo.ListProducts(c.Request.Context())
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"products": list})
-} /*处理http的主函数，通过句柄获取Context一些信息，
-  然后调用repo里面的ListProducts函数，
-  返回商品列表，最后把这个商品信息转为json格式*/
+	c.JSON(http.StatusOK, gin.H{"products": list})
+} /*处理http的主函数，传入c这个结构体指针*gin.Context，引用Request这个字段，调用 Request 的 Context 方法，拿到本次请求的 context.Context
+返回一个context.Context类型的对象，然后把这个对象传入到repo里面的ListProducts函数里面，
+返回商品列表，最后把这个商品信息转为json格式*/
