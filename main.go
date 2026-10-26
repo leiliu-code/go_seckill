@@ -27,9 +27,11 @@ func main() {
 	repo := NewProductRepo(db)         //注入依赖，repo依赖db
 	handler := NewProductHandler(repo) //注入依赖，handler依赖repo
 
-	r := gin.Default()                      //创建一个gin的默认实例，引擎engine，自带日志和恢复中间件
-	r.GET("/api/v1/products", handler.List) //写路由路径，传入商品信息
-	err = r.Run(":8080")                    //在常用端口上面运行这个程序
+	r := gin.Default()                         //创建一个gin的默认实例，引擎engine，自带日志和恢复中间件
+	r.GET("/api/v1/products", handler.List)    //路由，获取商品信息
+	r.GET("/api/v1/products/:id", handler.Get) //路由，获取请求的单个商品信息
+
+	err = r.Run(":8080") //在常用端口上面运行这个程序
 	if err != nil {
 		panic(fmt.Errorf("run server: %w", err))
 	}

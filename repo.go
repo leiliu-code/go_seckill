@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"gorm.io/gorm"
@@ -23,3 +24,18 @@ func (r *ProductRepo) ListProducts(ctx context.Context) ([]Product, error) {
 	}
 	return products, nil
 } //先定义了一个空商品切片，WithContext对句柄进行包装，Find函数查询数据库里面的products表，把结果放到products切片里面，最后返回这个切片和错误信息
+
+// 做什么：按主键查单个商品；返回 商品 / 找没找到 / 真错误 三样东西
+func (r *ProductRepo) GetProductByID(ctx context.Context, id uint64) (Product, bool, error) {
+	var product Product // 承接数据库返回的那一行
+	// First 按主键查一条；查不到时 GORM 会返回固定的错误值 gorm.ErrRecordNotFound
+	err := r.db.WithContext(ctx).First(&product, id).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) { // 是不是"没查到"这个特定的错
+		return Product{}, false, nil // 没找到：不是故障，交给上层决定回 404
+	}
+	if err != nil { // 其它错误（库连不上、SQL 错、超时）才算真故障
+		return Product{}, false, fmt.Errorf("get product by id %d: %w", id, err)
+	}
+	return product, true, nil // 找到了
+}
