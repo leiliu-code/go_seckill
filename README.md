@@ -4,7 +4,7 @@ go的秒杀项目，主要目的是为了一步一步学习go，了解go的并�
 
 ## 1. 技术栈
 
-- Go  1.27
+- Go  1.27 
 - MySQL8.0，库名 `seckill`
 - 无需 Docker、无需 Redis（MVP0）
 
@@ -39,6 +39,8 @@ go run .
 > 数据库用户 `dev`、地址 `127.0.0.1:3306`、库名 `seckill` 目前**写死在** `main.go:14-18`，要换需改代码。
 
 ## 5. 接口
+> 说明：所有命令用 `curl.exe`（PowerShell 里 `curl` 是 `Invoke-WebRequest` 的别名，参数不兼容）。
+> 下方 JSON 为便于阅读做了缩进，实际响应是单行紧凑 JSON。
 
 ### 5.1 商品列表 `GET /api/v1/products`
 
@@ -47,14 +49,51 @@ go run .
 curl.exe -i http://127.0.0.1:8080/api/v1/products
 ```
 
+预期输出（**共 10 条，此处只截前 2 条示意，非原样输出**）：
+
+```json
+{
+  "products": [
+    { "id": 1, "name": "1", "price": 10000, "stock": 100, "version": 0, 
+      "created_at": "2026-10-28T17:05:12+08:00", "updated_at": "2026-10-28T17:05:12+08:00" },
+    { "id": 2, "name": "2", "price": 20000, "stock": 100, "version": 0,
+      "created_at": "2026-10-28T17:05:12+08:00", "updated_at": "2026-10-28T17:05:12+08:00" }
+  ]
+}
+HTTP 200
+```
+- `price` 单位是**分**（`price: 10000` = 100 元）
+- 顶层键固定为 `products`；库为空时返回 `{"products":null}`
+
 ### 5.2 商品详情 `GET /api/v1/products/:id`
 
-| 请求 | 期望 |
-|---|---|
-| `/api/v1/products/1` | 200 |
-| `/api/v1/products/999` | 404 |
-| `/api/v1/products/abc` | 400 |
-| （停掉 MySQL）`/api/v1/products/1` | 500 |
+```powershell
+# 做什么：查 id=1 的商品
+curl.exe -s -w "`nHTTP %{http_code}`n" http://127.0.0.1:8080/api/v1/products/1
+```
+
+预期输出：
+
+```json
+{
+  "product": {
+    "id": 1, "name": "1", "price": 10000, "stock": 100, "version": 0,
+    "created_at": "2026-10-28T17:05:12+08:00", "updated_at": "2026-10-28T17:05:12+08:00"
+  }
+}
+HTTP 200
+```
+
+**异常情况**（4 条命令 + 预期，`error` 文案来自代码，可精确断言）：
+
+| 场景 | 命令 | 状态码 | 预期响应体 |
+|---|---|---|---|
+| id 不存在 | `curl.exe -s -w "`nHTTP %{http_code}`n" http://127.0.0.1:8080/api/v1/products/999` | 404 | `{"error":"商品不存在"}` |
+| id 非数字 | `... /api/v1/products/abc` | 400 | `{"error":"id 必须是数字"}` |
+| 数据库不可用 | 先停 MySQL80，再 `... /api/v1/products/1` | 500 | `{"error":"<驱动报错原文>"}`（内容随环境变化，断言状态码即可） |
+
+> 说明：500 的 `error` 是数据库驱动返回的原始错误（可能是 `invalid connection` 或 `dial tcp ...: connect: connection refused`），**不做断言**。
+
 ## 6. 当前限界（MVP0）
 
 - 无 Redis 预扣/缓存
