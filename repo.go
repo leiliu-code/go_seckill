@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// 在repo这个存储着数据库一些信息的文件里面把句柄作为了这个结构体字段保存
+// 在repo这个存储着数据库一些信息的文件里面把GORM 的会话/连接池对象作为了这个结构体字段保存
 type ProductRepo struct {
 	db *gorm.DB
 }

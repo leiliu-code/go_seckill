@@ -18,7 +18,7 @@ type Product struct {
 	Name      string    `gorm:"column:name" json:"name"`                      // 商品名称
 	Price     int64     `gorm:"column:price" json:"price"`                    // 单价 分
 	Stock     int32     `gorm:"column:stock" json:"stock"`                    // 剩余库存 件
-	Version   int32     `gorm:"column:version" json:"version"`                // 乐观锁版本号，每次扣库存,预留字段，本项目未使用；扣减走 stock>=n 的 CAS
+	Version   int32     `gorm:"column:version" json:"version"`                // 乐观锁版本号，每次扣库存,预留字段，本项目未使用
 	CreatedAt time.Time `gorm:"column:created_at" json:"created_at"`          // 创建时间，GORM 自动写入；DB 默认值兜底
 	UpdatedAt time.Time `gorm:"column:updated_at" json:"updated_at"`          // 最后更新时间，GORM 自动写入；DB 默认值兜底
 }

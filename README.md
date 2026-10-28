@@ -16,13 +16,13 @@ go_seckill/
 ├── handler.go               # 处理http请求
 ├── repo.go                  # 调用数据库
 ├── model.go                 # 结构体模板
-└── migrations/01_init.sql   # 数据库初始化文件，加入products和orders两张表及50条商品信息
+└── migrations/01_init.sql   # 数据库初始化文件，加入products和orders两张表及10条商品信息
 ```
 
 ## 3. 初始化数据库
 
 ```powershell
-# 做什么：建 products / orders 两张表（脚本自带 USE seckill; 和 IF NOT EXISTS，可重复执行）
+# 做什么：建 products / orders 两张表（脚本自带 USE seckill; 和 IF NOT EXISTS，幂等：建表靠 IF NOT EXISTS；数据靠固定 id + ON DUPLICATE KEY UPDATE，重复执行条数不变）
 mysql -u dev -p --default-character-set=utf8mb4 < migrations/01_init.sql
 ```
 
@@ -51,7 +51,7 @@ curl.exe -i http://127.0.0.1:8080/api/v1/products
 
 | 请求 | 期望 |
 |---|---|
-| `/api/v1/products/2` | 200 |
+| `/api/v1/products/1` | 200 |
 | `/api/v1/products/999` | 404 |
 | `/api/v1/products/abc` | 400 |
 | （停掉 MySQL）`/api/v1/products/1` | 500 |
